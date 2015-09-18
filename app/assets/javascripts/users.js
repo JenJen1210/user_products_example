@@ -1,7 +1,8 @@
 $(document).ready( function() {
   var baseUrl = 'http://devpoint-ajax-example-server.herokuapp.com/api/v1/users/';
   var deleteButton = "<div class='row center'><button class='delete'>Delete</button>";
-  var showButton = "<button id='show'>Show</button></div>";
+  var showButton = "<button id='show'>Show</button>";
+  var editButton = "<button id='edit-user-button'>Edit</button></div>"
   var divName = "<div class='row col m4 s12'>";
   $('#get_users').on('click', function() {
     $.ajax(baseUrl,
@@ -10,7 +11,7 @@ $(document).ready( function() {
              success: function(data) {
                for(index in data.users) {
                  var user = data.users[index];
-                 $('#users').append(divName + "<li class='person center-align' data-user-id='" + user.id + "'>" + user.first_name +  deleteButton + showButton + "</li></div>");
+                 $('#users').append(divName + "<li class='person center-align' data-user-id='" + user.id + "'>" + user.first_name +  deleteButton + showButton + editButton + "</li></div>");
                }
              },
              error: function(data) {
@@ -18,16 +19,6 @@ $(document).ready( function() {
              }
            });
   });
-
-  function showUser(user) {
-    $.ajax('/get_user', {
-      type: 'GET',
-      data: user,
-      success: function(data) {
-        $('body').html(data);
-      }
-    });
-  }
 
   $(document).on('click', '#show', function() {
     var id = $(this).closest('.person').data('user-id');
@@ -40,14 +31,32 @@ $(document).ready( function() {
       }
     });
 
+  function showUser(user) {
+    $.ajax('/get_user', { //local server route
+      type: 'GET',
+      data: user,
+      success: function(data) {
+        $('body').html(data);
+      }
+    });
+  }
 
   });
 
+  $('#add_partial').on('click', function() {
+    $.ajax('/add_partial',
+           {
+             type: 'GET',
+             success: function(data) {
+               $('body').append(data);
+             }
+           });
+  });
 
-  $(document).on('click', '.person', function() {
+  $(document).on('click', '#edit-user-button', function() {
    $('#edit_user').removeClass('hide');
-
-   $.ajax(baseUrl + $(this).data('user-id'),
+   $('#add_user').addClass('hide');
+   $.ajax(baseUrl + $(this).closest('.person').data('user-id'),
           {
             type: 'GET',
             success: function(data) {
@@ -73,6 +82,8 @@ $(document).ready( function() {
               $('#edit_user').addClass('hide');
             }
           });
+        $('#add_user').removeClass('hide');
+        $('#edit_user').addClass('hide');
   });
 
   $(document).on('click', '.delete', function() {
@@ -88,15 +99,7 @@ $(document).ready( function() {
 
   });
 
-  $('#add_partial').on('click', function() {
-    $.ajax('/add_partial',
-           {
-             type: 'GET',
-             success: function(data) {
-               $('body').append(data);
-             }
-           });
-  });
+
 
   $('.add').on('click', function(){
     var firstName = $('#new_first_name').val();
@@ -109,10 +112,12 @@ $(document).ready( function() {
        data: user,
        success: function(data) {
         var user = data.user;
-        $('#users').append("<li class='person' data-user-id='" + user.id + "'>" + user.first_name + deleteButton + showButton+ "</li>");
+        $('#users').append("<li class='person center-align' data-user-id='" + user.id + "'>" + user.first_name + deleteButton + showButton + editButton +  "</li>");
 
        }
     });
+    $('#add_user')[0].reset();
+
   });
 
 });
