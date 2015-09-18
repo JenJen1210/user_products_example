@@ -1,6 +1,8 @@
 $(document).ready( function() {
   var baseUrl = 'http://devpoint-ajax-example-server.herokuapp.com/api/v1/users/';
-
+  var deleteButton = "<div class='row center'><button class='delete'>Delete</button>";
+  var showButton = "<button id='show'>Show</button></div>";
+  var divName = "<div class='row col m4 s12'>";
   $('#get_users').on('click', function() {
     $.ajax(baseUrl,
            {
@@ -8,7 +10,7 @@ $(document).ready( function() {
              success: function(data) {
                for(index in data.users) {
                  var user = data.users[index];
-                 $('#users').append("<li class='person' data-user-id='" + user.id + "'>" + user.first_name + "<button class='btn delete'>Delete</button><button class='btn' id='show'>Show</button></li>");
+                 $('#users').append(divName + "<li class='person center-align' data-user-id='" + user.id + "'>" + user.first_name +  deleteButton + showButton + "</li></div>");
                }
              },
              error: function(data) {
@@ -76,7 +78,7 @@ $(document).ready( function() {
   $(document).on('click', '.delete', function() {
     var id = $(this).closest('.person').data('user-id');
     var that = $(this);
-   $.ajax('http://devpoint-ajax-example-server.herokuapp.com/api/v1/users/' + id,
+   $.ajax(baseUrl + id,
           {
             type: 'DELETE',
             success: function(data) {
@@ -107,7 +109,7 @@ $(document).ready( function() {
        data: user,
        success: function(data) {
         var user = data.user;
-        $('#users').append("<li class='person' data-user-id='" + user.id + "'>" + user.first_name + "<button class='btn delete'>Delete</button></li>");
+        $('#users').append("<li class='person' data-user-id='" + user.id + "'>" + user.first_name + deleteButton + showButton+ "</li>");
 
        }
     });
